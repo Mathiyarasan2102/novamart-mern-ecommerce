@@ -9,6 +9,10 @@ const initialState = {
 export const addNewProduct = createAsyncThunk(
   "/products/addnewproduct",
   async (formData) => {
+    localStorage.setItem("adminToken", token);
+    const token = localStorage.getItem("adminToken");
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    
     const result = await axios.post(
       `${import.meta.env.VITE_API_URL}/api/admin/products/add`,
       formData,
@@ -78,6 +82,7 @@ const AdminProductsSlice = createSlice({
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.productList = [];
+        console.error("Error fetching products:", action.error.message);
       });
   },
 });

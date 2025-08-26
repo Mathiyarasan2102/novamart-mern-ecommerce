@@ -100,8 +100,13 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user =  action.payload.user || null;
+        state.user = action.payload.user || null;
         state.isAuthenticated = action.payload.success || false;
+
+        // Save user info to localStorage
+        if (action.payload.success && action.payload.user) {
+          localStorage.setItem("userInfo", JSON.stringify(action.payload.user));
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -130,6 +135,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        // Clear localStorage
+        localStorage.removeItem("userInfo");
       });
   },
 });

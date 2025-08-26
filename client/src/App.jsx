@@ -49,9 +49,6 @@ if (isLoading)
     </div>
   );
 
-
-  console.log(isLoading, user);
-
   return (
     <div className="flex flex-col overflow-hidden bg-white">
           <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>

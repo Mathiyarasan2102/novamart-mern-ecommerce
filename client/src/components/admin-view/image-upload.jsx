@@ -18,12 +18,16 @@ function ProductImageUpload({
 }) {
   const inputRef = useRef(null);
 
-  console.log(isEditMode, "isEditMode");
+  {uploadedImageUrl && (
+  <img
+    src={uploadedImageUrl}
+    alt="Uploaded"
+    className="mt-2 w-full h-auto rounded"
+  />
+)}
 
   function handleImageFileChange(event) {
-    console.log(event.target.files, "event.target.files");
     const selectedFile = event.target.files?.[0];
-    console.log(selectedFile);
 
     if (selectedFile) setImageFile(selectedFile);
   }
@@ -50,10 +54,9 @@ function ProductImageUpload({
     const data = new FormData();
     data.append("my_file", imageFile);
     const response = await axios.post(
-      "http://localhost:5000/api/admin/products/upload-image",
+      `${import.meta.env.VITE_API_URL}/api/admin/products/upload-image`,
       data
     );
-    console.log(response, "response");
 
     if (response?.data?.success) {
       setUploadedImageUrl(response.data.result.url);

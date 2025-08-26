@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./auth-slice";
+import authReducer, {setUser} from "./auth-slice";
 import adminProductsSlice from "./admin/products-slice";
 import adminOrderSlice from "./admin/order-slice";
 
@@ -28,5 +28,10 @@ const store = configureStore({
     commonFeature: commonFeatureSlice,
   },
 });
+
+const savedUser = localStorage.getItem("userInfo");
+if (savedUser) {
+  store.dispatch(setUser(JSON.parse(savedUser)));
+}
 
 export default store;

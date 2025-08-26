@@ -68,7 +68,7 @@ const loginUser = async (req, res) => {
       { expiresIn: "60m" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: false, sameSite: "lax",   
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none",   
       maxAge: 60 * 60 * 1000, }).json({
       success: true,
       message: "Logged in successfully",
@@ -77,7 +77,7 @@ const loginUser = async (req, res) => {
         role: checkUser.role,
         id: checkUser._id,
         userName: checkUser.userName,
-      },
+      }, 
     });
   } catch (e) {
     console.log(e);
@@ -91,7 +91,7 @@ const loginUser = async (req, res) => {
 //logout
 
 const logoutUser = (req, res) => {
-  res.clearCookie("token",{httpOnly:true, secure:false, sameSite:"lax"}).json({
+  res.clearCookie("token",{httpOnly:true, secure: true, sameSite:"none"}).json({
     success: true,
     message: "Logged out successfully!",
   });
