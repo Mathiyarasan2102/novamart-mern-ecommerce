@@ -17,7 +17,7 @@ import CheckAuth from "./components/common/check-auth";
 import UnauthPage from "./pages/unauth-page";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { checkAuth } from "./store/auth-slice";
+import { checkAuth,setUser } from "./store/auth-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
@@ -30,7 +30,13 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(checkAuth());
+    // Persist login using localStorage
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      dispatch(setUser(storedUser));
+    } else {
+      dispatch(checkAuth());
+    }
   }, [dispatch]);
 
 if (isLoading)
@@ -48,49 +54,21 @@ if (isLoading)
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">
+          <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <CheckAuth
-              isAuthenticated={isAuthenticated}
-              user={user}
-              isLoading={isLoading}
-            ></CheckAuth>
-          }
-        />
-        <Route
-          path="/auth"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
-              <AuthLayout />
-            </CheckAuth>
-          }
-        >
+        <Route path="/auth" element={<AuthLayout />}>
           <Route path="login" element={<AuthLogin />} />
           <Route path="register" element={<AuthRegister />} />
         </Route>
-        <Route
-          path="/admin"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
-              <AdminLayout />
-            </CheckAuth>
-          }
-        >
+
+        <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="features" element={<AdminFeatures />} />
         </Route>
-        <Route
-          path="/shop"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
-              <ShoppingLayout />
-            </CheckAuth>
-          }
-        >
+
+        <Route path="/shop" element={<ShoppingLayout />}>
           <Route path="home" element={<ShoppingHome />} />
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="checkout" element={<ShoppingCheckout />} />
@@ -99,9 +77,11 @@ if (isLoading)
           <Route path="payment-success" element={<PaymentSuccessPage />} />
           <Route path="search" element={<SearchProducts />} />
         </Route>
+
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+    </CheckAuth>
     </div>
   );
 }
