@@ -33,7 +33,16 @@ function App() {
     dispatch(checkAuth());
   }, [dispatch]);
 
-  if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]" />;
+if (isLoading)
+  return (
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
+      <Skeleton className="w-[400px] h-[300px] bg-gray-300" />
+      <p className="mt-4 text-gray-700 text-lg font-medium">
+        Loading your data, please wait...
+      </p>
+    </div>
+  );
+
 
   console.log(isLoading, user);
 
@@ -46,13 +55,14 @@ function App() {
             <CheckAuth
               isAuthenticated={isAuthenticated}
               user={user}
+              isLoading={isLoading}
             ></CheckAuth>
           }
         />
         <Route
           path="/auth"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
               <AuthLayout />
             </CheckAuth>
           }
@@ -63,7 +73,7 @@ function App() {
         <Route
           path="/admin"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
               <AdminLayout />
             </CheckAuth>
           }
@@ -76,7 +86,7 @@ function App() {
         <Route
           path="/shop"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
               <ShoppingLayout />
             </CheckAuth>
           }

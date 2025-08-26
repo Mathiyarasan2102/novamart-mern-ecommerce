@@ -5,7 +5,8 @@ function CheckAuth({ isAuthenticated, user, children }) {
     const location = useLocation();
 
     console.log(location.pathname, isAuthenticated);
-    
+
+    if (isLoading || isAuthenticated === null) return null;
 
     if (location.pathname === "/") {
         if (!isAuthenticated) {
