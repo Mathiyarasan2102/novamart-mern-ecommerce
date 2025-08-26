@@ -61,9 +61,10 @@ const adminOrderSlice = createSlice({
         state.isLoading = false;
         state.orderList = action.payload.data;
       })
-      .addCase(getAllOrdersForAdmin.rejected, (state) => {
+      .addCase(getAllOrdersForAdmin.rejected, (state, action) => {
         state.isLoading = false;
         state.orderList = [];
+        state.error = action.payload || "Failed to fetch orders";
       })
       .addCase(getOrderDetailsForAdmin.pending, (state) => {
         state.isLoading = true;
@@ -72,9 +73,10 @@ const adminOrderSlice = createSlice({
         state.isLoading = false;
         state.orderDetails = action.payload.data;
       })
-      .addCase(getOrderDetailsForAdmin.rejected, (state) => {
+      .addCase(getOrderDetailsForAdmin.rejected, (state, action) => {
         state.isLoading = false;
         state.orderDetails = null;
+        state.error = action.payload || "Failed to fetch order details";
       });
   },
 });

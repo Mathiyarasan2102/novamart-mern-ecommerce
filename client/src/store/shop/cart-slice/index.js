@@ -73,9 +73,10 @@ const shoppingCartSlice = createSlice({
         state.isLoading = false;
         state.cartItems = action.payload.data;
       })
-      .addCase(addToCart.rejected, (state) => {
+      .addCase(addToCart.rejected, (state, action) => {
         state.isLoading = false;
         state.cartItems = [];
+        state.error = action.payload || "Failed to add item to cart";
       })
       .addCase(fetchCartItems.pending, (state) => {
         state.isLoading = true;
@@ -84,9 +85,10 @@ const shoppingCartSlice = createSlice({
         state.isLoading = false;
         state.cartItems = action.payload.data;
       })
-      .addCase(fetchCartItems.rejected, (state) => {
+      .addCase(fetchCartItems.rejected, (state, action) => {
         state.isLoading = false;
         state.cartItems = [];
+        state.error = action.payload || "Failed to fetch cart items";
       })
       .addCase(updateCartQuantity.pending, (state) => {
         state.isLoading = true;
@@ -95,9 +97,10 @@ const shoppingCartSlice = createSlice({
         state.isLoading = false;
         state.cartItems = action.payload.data;
       })
-      .addCase(updateCartQuantity.rejected, (state) => {
+      .addCase(updateCartQuantity.rejected, (state, action) => {
         state.isLoading = false;
         state.cartItems = [];
+        state.error = action.payload || "Failed to update cart quantity";
       })
       .addCase(deleteCartItem.pending, (state) => {
         state.isLoading = true;
@@ -106,9 +109,10 @@ const shoppingCartSlice = createSlice({
         state.isLoading = false;
         state.cartItems = action.payload.data;
       })
-      .addCase(deleteCartItem.rejected, (state) => {
+      .addCase(deleteCartItem.rejected, (state, action) => {
         state.isLoading = false;
         state.cartItems = [];
+        state.error = action.payload || "Failed to delete cart item";
       });
   },
 });

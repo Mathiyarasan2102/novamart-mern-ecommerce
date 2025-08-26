@@ -81,10 +81,11 @@ const shoppingOrderSlice = createSlice({
           JSON.stringify(action.payload.orderId)
         );
       })
-      .addCase(createNewOrder.rejected, (state) => {
+      .addCase(createNewOrder.rejected, (state, action) => {
         state.isLoading = false;
         state.approvalURL = null;
         state.orderId = null;
+        state.error = action.payload || "Failed to create order";
       })
       .addCase(getAllOrdersByUserId.pending, (state) => {
         state.isLoading = true;
@@ -93,9 +94,10 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = false;
         state.orderList = action.payload.data;
       })
-      .addCase(getAllOrdersByUserId.rejected, (state) => {
+      .addCase(getAllOrdersByUserId.rejected, (state, action) => {
         state.isLoading = false;
         state.orderList = [];
+        state.error = action.payload || "Failed to fetch orders";
       })
       .addCase(getOrderDetails.pending, (state) => {
         state.isLoading = true;
@@ -104,9 +106,10 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = false;
         state.orderDetails = action.payload.data;
       })
-      .addCase(getOrderDetails.rejected, (state) => {
+      .addCase(getOrderDetails.rejected, (state, action) => {
         state.isLoading = false;
         state.orderDetails = null;
+        state.error = action.payload || "Failed to fetch order details";
       });
   },
 });
