@@ -17,11 +17,12 @@ import CheckAuth from "./components/common/check-auth";
 import UnauthPage from "./pages/unauth-page";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { checkAuth,setUser } from "./store/auth-slice";
+import { checkAuth, setUser } from "./store/auth-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaypalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
+import ScrollToTop from "./components/common/scroll-to-top";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -39,46 +40,47 @@ function App() {
     }
   }, [dispatch]);
 
-if (isLoading)
-  return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
-      <Skeleton className="w-[400px] h-[300px] bg-gray-300" />
-      <p className="mt-4 text-gray-700 text-lg font-medium">
-        Loading your data, please wait...
-      </p>
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
+        <Skeleton className="w-[400px] h-[300px] bg-gray-300" />
+        <p className="mt-4 text-gray-700 text-lg font-medium">
+          Loading your data, please wait...
+        </p>
+      </div>
+    );
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">
-          <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
-      <Routes>
-        <Route path="/auth" element={<AuthLayout />}>
-          <Route path="login" element={<AuthLogin />} />
-          <Route path="register" element={<AuthRegister />} />
-        </Route>
+      <ScrollToTop />
+      <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={isLoading}>
+        <Routes>
+          <Route path="/auth" element={<AuthLayout />}>
+            <Route path="login" element={<AuthLogin />} />
+            <Route path="register" element={<AuthRegister />} />
+          </Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="features" element={<AdminFeatures />} />
-        </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="features" element={<AdminFeatures />} />
+          </Route>
 
-        <Route path="/shop" element={<ShoppingLayout />}>
-          <Route path="home" element={<ShoppingHome />} />
-          <Route path="listing" element={<ShoppingListing />} />
-          <Route path="checkout" element={<ShoppingCheckout />} />
-          <Route path="account" element={<ShoppingAccount />} />
-          <Route path="paypal-return" element={<PaypalReturnPage />} />
-          <Route path="payment-success" element={<PaymentSuccessPage />} />
-          <Route path="search" element={<SearchProducts />} />
-        </Route>
+          <Route path="/shop" element={<ShoppingLayout />}>
+            <Route path="home" element={<ShoppingHome />} />
+            <Route path="listing" element={<ShoppingListing />} />
+            <Route path="checkout" element={<ShoppingCheckout />} />
+            <Route path="account" element={<ShoppingAccount />} />
+            <Route path="paypal-return" element={<PaypalReturnPage />} />
+            <Route path="payment-success" element={<PaymentSuccessPage />} />
+            <Route path="search" element={<SearchProducts />} />
+          </Route>
 
-        <Route path="/unauth-page" element={<UnauthPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </CheckAuth>
+          <Route path="/unauth-page" element={<UnauthPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </CheckAuth>
     </div>
   );
 }

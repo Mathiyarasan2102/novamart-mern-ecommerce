@@ -4,17 +4,45 @@ import axios from "axios";
 const initialState = {
   isLoading: false,
   productList: [],
+  relatedProducts: [],
   productDetails: null,
 };
+
+export const fetchRelatedProducts = createAsyncThunk(
+  "/products/fetchRelatedProducts",
+  async ({ filterParams, sortParams }) => {
+
+    const query = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (Array.isArray(value) && value.length > 0) {
+        query.append(key.toLowerCase(), value.join(","));
+      }
+    }
+
+    query.append("sortBy", sortParams);
+
+    const result = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/shop/products/get?${query}`
+    );
+
+    return result?.data;
+  }
+);
 
 export const fetchAllFilteredProducts = createAsyncThunk(
   "/products/fetchAllProducts",
   async ({ filterParams, sortParams }) => {
 
-    const query = new URLSearchParams({
-      ...filterParams,
-      sortBy: sortParams,
-    });
+    const query = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(filterParams)) {
+      if (Array.isArray(value) && value.length > 0) {
+        query.append(key.toLowerCase(), value.join(","));
+      }
+    }
+
+    query.append("sortBy", sortParams);
 
     const result = await axios.get(
       `${import.meta.env.VITE_API_URL}/api/shop/products/get?${query}`
@@ -56,6 +84,18 @@ const shoppingProductSlice = createSlice({
         state.isLoading = false;
         state.productList = [];
         state.error = action.payload || "Failed to fetch products";
+      })
+      .addCase(fetchRelatedProducts.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchRelatedProducts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.relatedProducts = action.payload.data;
+      })
+      .addCase(fetchRelatedProducts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.relatedProducts = [];
+        state.error = action.payload || "Failed to fetch related products";
       })
       .addCase(fetchProductDetails.pending, (state) => {
         state.isLoading = true;

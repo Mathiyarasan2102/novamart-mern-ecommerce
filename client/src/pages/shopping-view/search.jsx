@@ -10,26 +10,32 @@ import {
 } from "@/store/shop/search-slice";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
 function SearchProducts() {
   const [keyword, setKeyword] = useState("");
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
-  const { searchResults } = useSelector((state) => state.shopSearch);
+  const { searchResults, isLoading } = useSelector((state) => state.shopSearch);
   const { productDetails } = useSelector((state) => state.shopProducts);
+  const [isPending, setIsPending] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { user } = useSelector((state) => state.auth);
 
   const { cartItems } = useSelector((state) => state.shopCart);
   const { toast } = useToast();
   useEffect(() => {
-    if (keyword && keyword.trim() !== "" && keyword.trim().length > 3) {
-      setTimeout(() => {
+    if (keyword && keyword.trim() !== "") {
+      const timer = setTimeout(() => {
         setSearchParams(new URLSearchParams(`?keyword=${keyword}`));
         dispatch(getSearchResults(keyword));
+        setIsPending(false);
       }, 1000);
+
+      return () => clearTimeout(timer);
     } else {
       setSearchParams(new URLSearchParams(`?keyword=${keyword}`));
       dispatch(resetSearchResults());
@@ -37,6 +43,10 @@ function SearchProducts() {
   }, [keyword, dispatch, setSearchParams]);
 
   function handleAddtoCart(getCurrentProductId, getTotalStock) {
+    if (!user) {
+      navigate("/auth/login", { state: { from: location } });
+      return;
+    }
     let getCartItems = cartItems.items || [];
 
     if (getCartItems.length) {
@@ -87,14 +97,24 @@ function SearchProducts() {
           <Input
             value={keyword}
             name="keyword"
-            onChange={(event) => setKeyword(event.target.value)}
+            onChange={(event) => {
+              setKeyword(event.target.value);
+              setIsPending(true);
+            }}
             className="py-6"
             placeholder="Search Products..."
           />
         </div>
       </div>
-      {!searchResults.length ? (
-        <h1 className="text-5xl font-extrabold">No result found!</h1>
+      {!searchResults.length && !isLoading && !isPending ? (
+        <div className="flex flex-col items-center justify-center w-full min-h-[300px] text-center">
+          <h1 className="text-4xl font-extrabold mb-4">
+            {keyword && keyword.trim() !== '' ? 'No result found!' : 'Search for products...'}
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            {keyword && keyword.trim() !== '' ? "Try different keywords or check for typos." : "Enter a keyword to explore our collection."}
+          </p>
+        </div>
       ) : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {searchResults.map((item) => (

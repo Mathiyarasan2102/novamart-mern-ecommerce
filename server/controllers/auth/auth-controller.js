@@ -14,6 +14,13 @@ const registerUser = async (req, res) => {
         message: "User Already exists with the same email! Please try again",
       });
 
+    const checkUserName = await User.findOne({ userName });
+    if (checkUserName)
+      return res.json({
+        success: false,
+        message: "User with the same username already exists! Please try a different one",
+      });
+
     const hashPassword = await bcrypt.hash(password, 12);
     const newUser = new User({
       userName,
@@ -31,6 +38,7 @@ const registerUser = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Some error occured",
+      error: e.message,
     });
   }
 };
@@ -68,8 +76,10 @@ const loginUser = async (req, res) => {
       { expiresIn: "60m" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none",   
-      maxAge: 60 * 60 * 1000, }).json({
+    res.cookie("token", token, {
+      httpOnly: true, secure: false, sameSite: "lax",
+      maxAge: 60 * 60 * 1000,
+    }).json({
       success: true,
       message: "Logged in successfully",
       user: {
@@ -77,7 +87,7 @@ const loginUser = async (req, res) => {
         role: checkUser.role,
         id: checkUser._id,
         userName: checkUser.userName,
-      }, 
+      },
     });
   } catch (e) {
     console.log(e);
@@ -91,7 +101,7 @@ const loginUser = async (req, res) => {
 //logout
 
 const logoutUser = (req, res) => {
-  res.clearCookie("token",{httpOnly:true, secure: true, sameSite:"none"}).json({
+  res.clearCookie("token", { httpOnly: true, secure: false, sameSite: "lax" }).json({
     success: true,
     message: "Logged out successfully!",
   });

@@ -2,21 +2,31 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { brandOptionsMap, categoryOptionsMap } from "@/config";
 import { Badge } from "../ui/badge";
+import { useState } from "react";
 
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
   handleAddtoCart,
 }) {
+  const [imageError, setImageError] = useState(false);
+
   return (
-    <Card className="w-full max-w-sm mx-auto">
-      <div onClick={() => handleGetProductDetails(product?._id)}>
+    <Card className="w-full max-w-sm mx-auto flex flex-col h-full">
+      <div className="flex flex-col flex-1 cursor-pointer" onClick={() => handleGetProductDetails(product?._id)}>
         <div className="relative">
-          <img
-            src={product?.image}
-            alt={product?.title}
-            className="w-full h-[300px] object-cover rounded-t-lg"
-          />
+          {product?.image && !imageError ? (
+            <img
+              src={product?.image}
+              alt={product?.title}
+              className="w-full h-[300px] object-cover rounded-t-lg"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-[300px] bg-gray-100 rounded-t-lg flex items-center justify-center">
+              <span className="text-gray-400 font-medium">Image Not Available</span>
+            </div>
+          )}
           {product?.totalStock === 0 ? (
             <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">
               Out Of Stock
@@ -43,9 +53,8 @@ function ShoppingProductTile({
           </div>
           <div className="flex justify-between items-center mb-2">
             <span
-              className={`${
-                product?.salePrice > 0 ? "line-through" : ""
-              } text-lg font-semibold text-primary`}
+              className={`${product?.salePrice > 0 ? "line-through" : ""
+                } text-lg font-semibold text-primary`}
             >
               ₹{product?.price}
             </span>

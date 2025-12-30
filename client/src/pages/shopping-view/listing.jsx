@@ -19,7 +19,7 @@ import {
 import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -47,6 +47,8 @@ function ShoppingListing() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const categorySearchParam = searchParams.get("category");
 
@@ -81,6 +83,11 @@ function ShoppingListing() {
   }
 
   function handleAddtoCart(getCurrentProductId, getTotalStock) {
+    if (!user) {
+      navigate("/auth/login", { state: { from: location } });
+      return;
+    }
+
     let getCartItems = cartItems.items || [];
 
     if (getCartItems.length) {
@@ -160,7 +167,7 @@ function ShoppingListing() {
                   <span>Sort by</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px] mt-3.5">
+              <DropdownMenuContent align="end" className="w-[200px] bg-white shadow-lg">
                 <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                   {sortOptions.map((sortItem) => (
                     <DropdownMenuRadioItem
@@ -178,12 +185,12 @@ function ShoppingListing() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
           {productList && productList.length > 0
             ? productList.map((productItem) => (
-                <ShoppingProductTitle
-                  handleGetProductDetails={handleGetProductDetails}
-                  product={productItem}
-                  handleAddtoCart={handleAddtoCart}
-                />
-              ))
+              <ShoppingProductTitle
+                handleGetProductDetails={handleGetProductDetails}
+                product={productItem}
+                handleAddtoCart={handleAddtoCart}
+              />
+            ))
             : null}
         </div>
       </div>

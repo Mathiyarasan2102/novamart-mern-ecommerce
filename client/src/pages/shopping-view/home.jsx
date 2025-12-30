@@ -12,9 +12,14 @@ import {
   ShoppingBasket,
   UmbrellaIcon,
   WashingMachine,
-  // WatchIcon,
 } from "lucide-react";
-
+import {
+  SiNike,
+  SiAdidas,
+  SiPuma,
+  SiZara,
+  SiHandm,
+} from "react-icons/si";
 
 import ManIcon from '@mui/icons-material/Man';
 import WomanIcon from '@mui/icons-material/Woman';
@@ -30,11 +35,15 @@ import {
   fetchProductDetails,
 } from "@/store/shop/products-slice";
 import ShoppingProductTitle from "@/components/shopping-view/product-title";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { getFeatureImages } from "@/store/common-slice";
+
+import bannerOne from "../../assets/banner-1.webp";
+import bannerTwo from "../../assets/banner-2.webp";
+import bannerThree from "../../assets/banner-3.webp";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ManIcon },
@@ -44,15 +53,17 @@ const categoriesWithIcon = [
   { id: "footwear", label: "Footwear", icon: DirectionsRunIcon },
 ];
 
-
 const brandsWithIcon = [
-  { id: "nike", label: "Nike", icon: Shirt },
-  { id: "adidas", label: "Adidas", icon: WashingMachine },
-  { id: "puma", label: "Puma", icon: ShoppingBasket },
+  { id: "nike", label: "Nike", icon: SiNike },
+  { id: "adidas", label: "Adidas", icon: SiAdidas },
+  { id: "puma", label: "Puma", icon: SiPuma },
   { id: "levi", label: "Levi's", icon: Airplay },
-  { id: "zara", label: "Zara", icon: Images },
-  { id: "h&m", label: "H&M", icon: Heater },
+  { id: "zara", label: "Zara", icon: SiZara },
+  { id: "h&m", label: "H&M", icon: SiHandm },
 ];
+
+const slides = [bannerOne, bannerTwo, bannerThree];
+
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { productList, productDetails } = useSelector(
@@ -66,6 +77,7 @@ function ShoppingHome() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   function handleNavigateToListingPage(getCurrentItem, section) {
@@ -83,6 +95,11 @@ function ShoppingHome() {
   }
 
   function handleAddtoCart(getCurrentProductId) {
+    if (!user) {
+      navigate("/auth/login", { state: { from: location } });
+      return;
+    }
+
     dispatch(
       addToCart({
         userId: user?.id,
@@ -105,11 +122,11 @@ function ShoppingHome() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % featureImageList.length);
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
     }, 15000);
 
     return () => clearInterval(timer);
-  }, [featureImageList]);
+  }, []); // Removed specific dependency as slides is static
 
   useEffect(() => {
     dispatch(
@@ -128,24 +145,22 @@ function ShoppingHome() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="relative w-full h-[600px] overflow-hidden">
-        {featureImageList && featureImageList.length > 0
-          ? featureImageList.map((slide, index) => (
-            <img
-              src={slide?.image}
-              key={index}
-              className={`${index === currentSlide ? "opacity-100" : "opacity-0"
-                } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
-            />
-          ))
-          : null}
+        {slides.map((slide, index) => (
+          <img
+            src={slide}
+            key={index}
+            className={`${index === currentSlide ? "opacity-100" : "opacity-0"
+              } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
+          />
+        ))}
         <Button
           variant="outline"
           size="icon"
           onClick={() =>
             setCurrentSlide(
               (prevSlide) =>
-                (prevSlide - 1 + featureImageList.length) %
-                featureImageList.length
+                (prevSlide - 1 + slides.length) %
+                slides.length
             )
           }
           className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80"
@@ -157,7 +172,7 @@ function ShoppingHome() {
           size="icon"
           onClick={() =>
             setCurrentSlide(
-              (prevSlide) => (prevSlide + 1) % featureImageList.length
+              (prevSlide) => (prevSlide + 1) % slides.length
             )
           }
           className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80"

@@ -66,13 +66,11 @@ function MenuItems() {
 }
 
 function HeaderRightContent() {
-	const { user } = useSelector((state) => state.auth);
-	// const { cartItems } = useSelector((state) => state.shopCart);
-	const cartItems = useSelector((state) => state.shopCart?.cartItems ?? []);
-
-
+	const { user, isAuthenticated } = useSelector((state) => state.auth); // Added isAuthenticated
+	const { cartItems } = useSelector((state) => state.shopCart);
 	const [openCartSheet, setOpenCartSheet] = useState(false);
 	const navigate = useNavigate();
+	const location = useLocation(); // Include useLocation
 	const dispatch = useDispatch();
 
 	function handleLogout() {
@@ -80,8 +78,31 @@ function HeaderRightContent() {
 	}
 
 	useEffect(() => {
-		dispatch(fetchCartItems(user?.id));
-	}, [dispatch]);
+		if (user?.id) {
+			dispatch(fetchCartItems(user?.id));
+		}
+	}, [dispatch, user]);
+
+	if (!isAuthenticated) {
+		return (
+			<div className="flex lg:items-center lg:flex-row flex-col gap-4">
+				<Button
+					onClick={() => navigate('/auth/login', { state: { from: location } })}
+					variant="outline"
+					size="icon"
+					className="relative"
+				>
+					<ShoppingCart className="w-6 h-6" />
+					<span className="sr-only">User cart</span>
+				</Button>
+				<Button
+					onClick={() => navigate('/auth/login', { state: { from: location } })}
+				>
+					Login
+				</Button>
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex lg:items-center lg:flex-row flex-col gap-4">

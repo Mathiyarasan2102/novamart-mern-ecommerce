@@ -74,6 +74,7 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
+      state.isLoading = false;
     },
   },
   extraReducers: (builder) => {
@@ -105,7 +106,7 @@ const authSlice = createSlice({
 
         // Save user info to localStorage
         if (action.payload.success && action.payload.user) {
-          localStorage.setItem("userInfo", JSON.stringify(action.payload.user));
+          localStorage.setItem("user", JSON.stringify(action.payload.user));
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -123,11 +124,15 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload.user || null;
         state.isAuthenticated = action.payload.success || false;
+        if (action.payload.success && action.payload.user) {
+          localStorage.setItem("user", JSON.stringify(action.payload.user));
+        }
       })
       .addCase(checkAuth.rejected, (state) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        localStorage.removeItem("user");
       })
 
       // LOGOUT
@@ -136,7 +141,7 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         // Clear localStorage
-        localStorage.removeItem("userInfo");
+        localStorage.removeItem("user");
       });
   },
 });
