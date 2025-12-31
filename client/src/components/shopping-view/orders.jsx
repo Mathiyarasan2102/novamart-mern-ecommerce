@@ -18,12 +18,13 @@ import {
   resetOrderDetails,
 } from "@/store/shop/order-slice";
 import { Badge } from "../ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function ShoppingOrders() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { orderList, orderDetails } = useSelector((state) => state.shopOrder);
+  const { orderList, orderDetails, isLoading } = useSelector((state) => state.shopOrder);
 
   function handleFetchOrderDetails(getId) {
     dispatch(getOrderDetails(getId));
@@ -56,7 +57,18 @@ function ShoppingOrders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orderList && orderList.length > 0
+            {isLoading ? (
+              // Render 5 skeleton rows
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton className="h-4 w-20 bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24 bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-20 rounded-full bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-16 bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-24 bg-gray-200" /></TableCell>
+                </TableRow>
+              ))
+            ) : orderList && orderList.length > 0
               ? orderList.map((orderItem) => (
                 <TableRow key={orderItem?._id}>
                   <TableCell>{orderItem?._id}</TableCell>

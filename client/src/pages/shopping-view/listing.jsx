@@ -16,6 +16,7 @@ import {
   fetchAllFilteredProducts,
   fetchProductDetails,
 } from "@/store/shop/products-slice";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,7 +38,7 @@ function createSearchParamsHelper(filterParams) {
 
 function ShoppingListing() {
   const dispatch = useDispatch();
-  const { productList, productDetails } = useSelector(
+  const { productList, productDetails, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -183,15 +184,52 @@ function ShoppingListing() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {productList && productList.length > 0
-            ? productList.map((productItem) => (
+          {isLoading ? (
+            // Render 8 skeleton items as placeholder
+            Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="w-full max-w-sm mx-auto p-2"
+              >
+                {/* Image placeholder */}
+                <Skeleton className="h-[300px] w-full rounded-t-lg bg-gray-200" />
+                {/* Title placeholder */}
+                <div className="mt-4 space-y-2">
+                  <Skeleton className="h-6 w-3/4 bg-gray-200" />
+                  <div className="flex justify-between">
+                    <Skeleton className="h-4 w-1/3 bg-gray-200" />
+                    <Skeleton className="h-4 w-1/3 bg-gray-200" />
+                  </div>
+                  {/* Price placeholder */}
+                  <div className="flex justify-between mt-2">
+                    <Skeleton className="h-5 w-1/4 bg-gray-200" />
+                    <Skeleton className="h-5 w-1/4 bg-gray-200" />
+                  </div>
+                </div>
+                {/* Footer button placeholder */}
+                <div className="mt-4">
+                  <Skeleton className="h-10 w-full bg-gray-200" />
+                </div>
+              </div>
+            ))
+          ) : productList && productList.length > 0 ? (
+            productList.map((productItem) => (
               <ShoppingProductTitle
                 handleGetProductDetails={handleGetProductDetails}
                 product={productItem}
                 handleAddtoCart={handleAddtoCart}
               />
             ))
-            : null}
+          ) : (
+            <div className="col-span-full flex flex-col items-center justify-center py-20">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                No Products Found
+              </h2>
+              <p className="text-muted-foreground">
+                We couldn't find any products in this category.
+              </p>
+            </div>
+          )}
         </div>
       </div>
       <ProductDetailsDialog

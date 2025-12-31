@@ -5,6 +5,7 @@ const Feature = require("./models/Feature");
 const User = require("./models/User");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
+const { imageUploadUtil } = require("./helpers/cloudinary");
 
 const categories = ["men", "women", "kids", "accessories", "footwear"];
 const brands = ["nike", "adidas", "puma", "levi", "zara", "h&m"];
@@ -197,6 +198,26 @@ const generateUniqueProducts = async () => {
         await adminUser.save();
         console.log("Created Admin User: admin@gmail.com / admin123");
 
+        // Helper to upload images with caching
+        const uploadedImages = {};
+        const getCloudinaryUrl = async (url) => {
+            if (uploadedImages[url]) return uploadedImages[url];
+            try {
+                console.log(`Uploading image to Cloudinary: ${url}`);
+                const result = await imageUploadUtil(url);
+                if (result && result.secure_url) {
+                    uploadedImages[url] = result.secure_url;
+                    return result.secure_url;
+                } else {
+                    console.warn(`Upload failed for ${url}, using original.`);
+                    return url;
+                }
+            } catch (error) {
+                console.error(`Error uploading ${url}:`, error.message);
+                return url;
+            }
+        };
+
         const products = [];
         let globalCounter = 1;
 
@@ -219,10 +240,6 @@ const generateUniqueProducts = async () => {
                         } else if (imageMap[category]["default"]) {
                             imageList = imageMap[category]["default"];
                         } else {
-                            // Fallback if brand specific not found in simple categories (like men/women sharing some logic?)
-                            // For simplicity, if 'women' has no 'adidas', it might just crash if I don't handle.
-                            // But I filled most. For 'kids', 'accessories', 'footwear', I added defaults.
-                            // For men/women, I filled all brands. 
                             // Safety backup:
                             imageList = Object.values(imageMap[category])[0] || [];
                         }
@@ -233,14 +250,15 @@ const generateUniqueProducts = async () => {
                         imageList = bannerImages;
                     }
 
-                    const image = imageList[i % imageList.length];
+                    const originalImage = imageList[i % imageList.length];
+                    const cloudinaryImage = await getCloudinaryUrl(originalImage);
 
                     const price = Math.floor(Math.random() * 8000) + 500;
                     const hasSale = Math.random() > 0.4;
                     const salePrice = hasSale ? Math.floor(price * 0.8) : null;
 
                     products.push({
-                        image,
+                        image: cloudinaryImage,
                         title: uniqueTitle,
                         description: `Experience the ${adjective.toLowerCase()} quality of this ${brand} ${noun.toLowerCase()}. Perfect for your ${category} collection.`,
                         category,
@@ -259,9 +277,38 @@ const generateUniqueProducts = async () => {
         await Product.insertMany(products);
         console.log(`Seeded ${products.length} unique products.`);
 
-        const features = bannerImages.map(image => ({ image }));
+        const path = require("path");
+
+        // ... (existing imports)
+
+        // ... (inside generateUniqueProducts)
+
+        const features = [];
+        const localAssets = [
+            { path: "../client/src/assets/banner-1.webp", type: "slider" },
+            { path: "../client/src/assets/banner-2.webp", type: "slider" },
+            { path: "../client/src/assets/banner-3.webp", type: "slider" },
+            { path: "../client/src/assets/account.jpg", type: "account" },
+            { path: "../client/src/assets/login-banner.jpg", type: "login" },
+        ];
+
+        for (const asset of localAssets) {
+            const fullPath = path.join(__dirname, asset.path);
+            try {
+                console.log(`Uploading ${asset.path} to Cloudinary...`);
+                // Use built-in cloudinary upload directly for local files or utilize the helper if it supports path strings (it does)
+                const result = await imageUploadUtil(fullPath);
+                if (result && result.secure_url) {
+                    features.push({ image: result.secure_url, type: asset.type });
+                } else {
+                    console.error(`Failed to upload ${asset.path}`);
+                }
+            } catch (error) {
+                console.error(`Error uploading ${asset.path}:`, error.message);
+            }
+        }
         await Feature.insertMany(features);
-        console.log(`Seeded ${features.length} banner images.`);
+        console.log(`Seeded ${features.length} feature images.`);
 
         console.log("Seeding complete!");
         process.exit(0);

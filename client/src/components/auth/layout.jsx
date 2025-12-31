@@ -9,7 +9,7 @@ function AuthLayout() {
                 <img
                     src={loginBanner}
                     alt="Login Banner"
-                    className="absolute inset-0 w-full h-full "
+                    className="absolute inset-0 w-full h-full object-cover"
                 />
                 {/* Dark Overlay for Text Readability */}
                 <div className="absolute inset-0 bg-black/60 z-10" />

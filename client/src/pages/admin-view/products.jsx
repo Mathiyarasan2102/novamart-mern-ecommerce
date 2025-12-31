@@ -18,6 +18,7 @@ import {
 } from "@/store/admin/products-slice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const initialFormData = {
   image: null,
@@ -40,7 +41,7 @@ function AdminProducts() {
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
-  const { productList } = useSelector((state) => state.adminProducts);
+  const { productList, isLoading } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
@@ -117,7 +118,21 @@ function AdminProducts() {
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {productList && productList.length > 0
+        {isLoading ? (
+          // Render 8 skeleton cards for admin products
+          Array.from({ length: 8 }).map((_, index) => (
+            <div
+              key={index}
+              className="w-full max-w-sm mx-auto p-2"
+            >
+              <Skeleton className="h-[300px] w-full rounded-t-lg bg-gray-200" />
+              <div className="mt-4 space-y-2">
+                <Skeleton className="h-6 w-3/4 bg-gray-200" />
+                <Skeleton className="h-4 w-1/2 bg-gray-200" />
+              </div>
+            </div>
+          ))
+        ) : productList && productList.length > 0
           ? productList.map((productItem) => (
             <AdminProductTitle
               setFormData={setFormData}

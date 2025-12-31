@@ -40,10 +40,7 @@ import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { getFeatureImages } from "@/store/common-slice";
-
-import bannerOne from "../../assets/banner-1.webp";
-import bannerTwo from "../../assets/banner-2.webp";
-import bannerThree from "../../assets/banner-3.webp";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ManIcon },
@@ -62,14 +59,16 @@ const brandsWithIcon = [
   { id: "h&m", label: "H&M", icon: SiHandm },
 ];
 
-const slides = [bannerOne, bannerTwo, bannerThree];
-
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { productList, productDetails } = useSelector(
+  const { productList, productDetails, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { featureImageList } = useSelector((state) => state.commonFeature);
+
+  const slides = featureImageList && featureImageList.length > 0
+    ? featureImageList.filter(item => item.type === "slider" || !item.type).map(item => item.image)
+    : [];
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
@@ -121,12 +120,14 @@ function ShoppingHome() {
   }, [productDetails]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
-    }, 15000);
+    if (slides.length > 0) {
+      const timer = setInterval(() => {
+        setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+      }, 15000);
 
-    return () => clearInterval(timer);
-  }, []); // Removed specific dependency as slides is static
+      return () => clearInterval(timer);
+    }
+  }, [featureImageList]);
 
   useEffect(() => {
     dispatch(
@@ -232,7 +233,24 @@ function ShoppingHome() {
             Feature Products
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productList && productList.length > 0
+            {isLoading ? (
+              // Render 6 skeleton cards for home page
+              Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="w-full max-w-sm mx-auto p-2"
+                >
+                  <Skeleton className="h-[300px] w-full rounded-t-lg bg-gray-200" />
+                  <div className="mt-4 space-y-2">
+                    <Skeleton className="h-6 w-3/4 bg-gray-200" />
+                    <Skeleton className="h-4 w-1/2 bg-gray-200" />
+                  </div>
+                  <div className="mt-4">
+                    <Skeleton className="h-10 w-full bg-gray-200" />
+                  </div>
+                </div>
+              ))
+            ) : productList && productList.length > 0
               ? productList.map((productItem, index) => (
                 <ShoppingProductTitle
                   key={index}

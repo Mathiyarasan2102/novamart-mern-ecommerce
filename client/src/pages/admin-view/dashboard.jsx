@@ -1,15 +1,16 @@
 import ProductImageUpload from "@/components/admin-view/image-upload";
 import { Button } from "@/components/ui/button";
-import { addFeatureImage, getFeatureImages } from "@/store/common-slice";
+import { addFeatureImage, getFeatureImages, deleteFeatureImage } from "@/store/common-slice";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function AdminDashboard() {
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const dispatch = useDispatch();
-  const { featureImageList } = useSelector((state) => state.commonFeature);
+  const { featureImageList, isLoading } = useSelector((state) => state.commonFeature);
 
 
   function handleUploadFeatureImage() {
@@ -18,6 +19,16 @@ function AdminDashboard() {
         dispatch(getFeatureImages());
         setImageFile(null);
         setUploadedImageUrl("");
+      }
+    });
+  }
+
+  function handleDeleteFeatureImage(id) {
+    console.log(id);
+
+    dispatch(deleteFeatureImage(id)).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getFeatureImages());
       }
     });
   }
@@ -37,7 +48,7 @@ function AdminDashboard() {
         setImageLoadingState={setImageLoadingState}
         imageLoadingState={imageLoadingState}
         isCustomStyling={true}
-        // isEditMode={currentEditedId !== null}
+      // isEditMode={currentEditedId !== null}
       />
       <Button onClick={handleUploadFeatureImage} disabled={!uploadedImageUrl} className="mt-5 inline-flex gap-2 items-center px-4 py-2 text-sm font-medium rounded-full cursor-pointer bg-black text-white border-2 border-transparent shadow
                hover:bg-white hover:text-black hover:border-black hover:rounded-full
@@ -45,15 +56,34 @@ function AdminDashboard() {
         Upload
       </Button>
       <div className="flex flex-col gap-4 mt-5">
-        {featureImageList && featureImageList.length > 0
+        {isLoading ? (
+          // Render 3 skeleton items for feature images
+          Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="relative">
+              <Skeleton className="w-full h-[300px] rounded-t-lg bg-gray-200" />
+            </div>
+          ))
+        ) : featureImageList && featureImageList.length > 0
           ? featureImageList.map((featureImgItem) => (
-              <div className="relative">
-                <img
-                  src={featureImgItem.image}
-                  className="w-full h-[300px] object-cover rounded-t-lg"
-                />
-              </div>
-            ))
+            <div className="relative">
+              <img
+                src={featureImgItem.image}
+                className="w-full h-[300px] object-cover rounded-t-lg"
+              />
+              <Button
+                onClick={() => handleDeleteFeatureImage(featureImgItem._id)}
+                className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-2 h-8 w-8 flex items-center justify-center">
+                <span className="sr-only">Delete</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                  <line x1="10" x2="10" y1="11" y2="17"></line>
+                  <line x1="14" x2="14" y1="11" y2="17"></line>
+                </svg>
+              </Button>
+            </div>
+          ))
           : null}
       </div>
     </div>

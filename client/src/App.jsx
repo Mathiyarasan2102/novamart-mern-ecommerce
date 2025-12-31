@@ -35,17 +35,17 @@ function App() {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       dispatch(setUser(storedUser));
-    } else {
-      dispatch(checkAuth());
     }
+    dispatch(checkAuth()); // Always check backend session
   }, [dispatch]);
 
   if (isLoading)
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
-        <Skeleton className="w-[400px] h-[300px] bg-gray-300" />
-        <p className="mt-4 text-gray-700 text-lg font-medium">
-          Loading your data, please wait...
+      <div className="flex flex-col justify-center items-center min-h-screen bg-white">
+        {/* Simple modern spinner */}
+        <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-800 text-lg font-semibold tracking-wide animate-pulse">
+          Loading your experience...
         </p>
       </div>
     );

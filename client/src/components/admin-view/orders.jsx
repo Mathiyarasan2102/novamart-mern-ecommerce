@@ -18,10 +18,11 @@ import {
   resetOrderDetails,
 } from "@/store/admin/order-slice";
 import { Badge } from "../ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function AdminOrdersView() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const { orderList, orderDetails } = useSelector((state) => state.adminOrder);
+  const { orderList, orderDetails, isLoading } = useSelector((state) => state.adminOrder);
   const dispatch = useDispatch();
 
   function handleFetchOrderDetails(getId) {
@@ -57,18 +58,29 @@ function AdminOrdersView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orderList && orderList.length > 0
+            {isLoading ? (
+              // Render 5 skeleton rows
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton className="h-4 w-20 bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24 bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-20 rounded-full bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-16 bg-gray-200" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-24 bg-gray-200" /></TableCell>
+                </TableRow>
+              ))
+            ) : orderList && orderList.length > 0
               ? orderList.map((orderItem) => (
-                <TableRow>
+                <TableRow key={orderItem?._id}>
                   <TableCell>{orderItem?._id}</TableCell>
                   <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
                   <TableCell>
                     <Badge
                       className={`py-1 text-white px-3 ${orderItem?.orderStatus === "confirmed"
-                          ? "bg-green-500"
-                          : orderItem?.orderStatus === "rejected"
-                            ? "bg-red-600"
-                            : "bg-black"
+                        ? "bg-green-500"
+                        : orderItem?.orderStatus === "rejected"
+                          ? "bg-red-600"
+                          : "bg-black"
                         }`}
                     >
                       {orderItem?.orderStatus}

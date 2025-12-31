@@ -126,6 +126,8 @@ const authSlice = createSlice({
         state.isAuthenticated = action.payload.success || false;
         if (action.payload.success && action.payload.user) {
           localStorage.setItem("user", JSON.stringify(action.payload.user));
+        } else {
+          localStorage.removeItem("user"); // Clear if backend says invalid
         }
       })
       .addCase(checkAuth.rejected, (state) => {
