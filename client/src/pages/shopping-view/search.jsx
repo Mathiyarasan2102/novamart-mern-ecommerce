@@ -120,6 +120,12 @@ function SearchProducts() {
         {searchResults.map((item) => (
           <ShoppingProductTitle
             handleAddtoCart={handleAddtoCart}
+            isInCart={
+              cartItems?.items?.length > 0 &&
+              cartItems.items.findIndex(
+                (cartItem) => cartItem.productId === item._id
+              ) > -1
+            }
             product={item}
             handleGetProductDetails={handleGetProductDetails}
           />

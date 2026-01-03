@@ -218,6 +218,12 @@ function ShoppingListing() {
                 handleGetProductDetails={handleGetProductDetails}
                 product={productItem}
                 handleAddtoCart={handleAddtoCart}
+                isInCart={
+                  cartItems?.items?.length > 0 &&
+                  cartItems.items.findIndex(
+                    (item) => item.productId === productItem._id
+                  ) > -1
+                }
               />
             ))
           ) : (

@@ -182,8 +182,19 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                       productDetails?.totalStock
                     )
                   }
+                  disabled={
+                    cartItems?.items?.length > 0 &&
+                    cartItems.items.findIndex(
+                      (item) => item.productId === productDetails?._id
+                    ) > -1
+                  }
                 >
-                  Add to Cart
+                  {cartItems?.items?.length > 0 &&
+                    cartItems.items.findIndex(
+                      (item) => item.productId === productDetails?._id
+                    ) > -1
+                    ? "Item added to cart"
+                    : "Add to Cart"}
                 </Button>
               )}
             </div>
@@ -257,6 +268,12 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                     handleGetProductDetails={handleGetProductDetails}
                     product={productItem}
                     handleAddtoCart={handleAddToCart}
+                    isInCart={
+                      cartItems?.items?.length > 0 &&
+                      cartItems.items.findIndex(
+                        (item) => item.productId === productItem._id
+                      ) > -1
+                    }
                   />
                 ))
             ) : (

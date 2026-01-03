@@ -77,7 +77,7 @@ function AdminSideBar({ open, setOpen }) {
 
                 </SheetContent>
             </Sheet>
-            <aside className="hidden w-64 flex-col border-r bg-background p-4 lg:flex">
+            <aside className="hidden w-64 flex-col border-r bg-background p-4 lg:flex fixed left-0 top-0 bottom-0">
                 <div
                     onClick={() => navigate("/admin/dashboard")}
                     className="flex cursor-pointer items-center gap-2"
@@ -86,7 +86,7 @@ function AdminSideBar({ open, setOpen }) {
                     <h1 className="text-2xl font-extrabold">Admin Panel</h1>
                 </div>
                 <MenuItems />
-                <p className="text-sm text-muted-foreground m-2">
+                <p className="text-sm text-muted-foreground m-2 mt-auto">
                     &copy; {new Date().getFullYear()} E-Commerce. All rights reserved.
                 </p>
             </aside>

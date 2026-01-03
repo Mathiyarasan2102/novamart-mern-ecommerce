@@ -41,7 +41,15 @@ function ShoppingOrderDetailsView({ orderDetails }) {
                   ? "bg-green-500"
                   : orderDetails?.orderStatus === "rejected"
                     ? "bg-red-600"
-                    : "bg-black"
+                    : orderDetails?.orderStatus === "pending"
+                      ? "bg-yellow-500"
+                      : orderDetails?.orderStatus === "inProcess"
+                        ? "bg-blue-500"
+                        : orderDetails?.orderStatus === "inShipping"
+                          ? "bg-purple-500"
+                          : orderDetails?.orderStatus === "delivered"
+                            ? "bg-green-500"
+                            : "bg-black"
                   }`}
               >
                 {orderDetails?.orderStatus}

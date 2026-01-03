@@ -80,7 +80,15 @@ function AdminOrdersView() {
                         ? "bg-green-500"
                         : orderItem?.orderStatus === "rejected"
                           ? "bg-red-600"
-                          : "bg-black"
+                          : orderItem?.orderStatus === "pending"
+                            ? "bg-yellow-500"
+                            : orderItem?.orderStatus === "inProcess"
+                              ? "bg-blue-500"
+                              : orderItem?.orderStatus === "inShipping"
+                                ? "bg-purple-500"
+                                : orderItem?.orderStatus === "delivered"
+                                  ? "bg-green-500"
+                                  : "bg-black"
                         }`}
                     >
                       {orderItem?.orderStatus}

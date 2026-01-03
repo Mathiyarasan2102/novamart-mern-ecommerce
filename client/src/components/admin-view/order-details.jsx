@@ -68,13 +68,20 @@ function AdminOrderDetailsView({ orderDetails }) {
             <p className="font-medium">Order Status</p>
             <Label>
               <Badge
-                className={`py-1 px-3 text-white ${
-                  orderDetails?.orderStatus === "confirmed"
+                className={`py-1 px-3 text-white ${orderDetails?.orderStatus === "confirmed"
                     ? "bg-green-500"
                     : orderDetails?.orderStatus === "rejected"
-                    ? "bg-red-600"
-                    : "bg-black"
-                }`}
+                      ? "bg-red-600"
+                      : orderDetails?.orderStatus === "pending"
+                        ? "bg-yellow-500"
+                        : orderDetails?.orderStatus === "inProcess"
+                          ? "bg-blue-500"
+                          : orderDetails?.orderStatus === "inShipping"
+                            ? "bg-purple-500"
+                            : orderDetails?.orderStatus === "delivered"
+                              ? "bg-green-500"
+                              : "bg-black"
+                  }`}
               >
                 {orderDetails?.orderStatus}
               </Badge>
@@ -88,12 +95,12 @@ function AdminOrderDetailsView({ orderDetails }) {
             <ul className="grid gap-3">
               {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
                 ? orderDetails?.cartItems.map((item) => (
-                    <li className="flex items-center justify-between">
-                      <span>Title: {item.title}</span>
-                      <span>Quantity: {item.quantity}</span>
-                      <span>Price: ₹{item.price}</span>
-                    </li>
-                  ))
+                  <li className="flex items-center justify-between">
+                    <span>Title: {item.title}</span>
+                    <span>Quantity: {item.quantity}</span>
+                    <span>Price: ₹{item.price}</span>
+                  </li>
+                ))
                 : null}
             </ul>
           </div>
@@ -113,7 +120,7 @@ function AdminOrderDetailsView({ orderDetails }) {
         </div>
 
         <div>
-          
+
           <CommonForm
             formControls={[
               {
@@ -122,19 +129,19 @@ function AdminOrderDetailsView({ orderDetails }) {
                 componentType: "select",
                 options: [
                   { id: "pending", label: "Pending" },
-                  { id: "inProcess", label: "In Process"},
-                  { id: "inShipping", label: "In Shipping"},
-                  { id: "delivered", label: "Delivered"},
-                  { id: "rejected", label: "Rejected"},
+                  { id: "inProcess", label: "In Process" },
+                  { id: "inShipping", label: "In Shipping" },
+                  { id: "delivered", label: "Delivered" },
+                  { id: "rejected", label: "Rejected" },
                 ],
-                
+
               },
             ]}
             formData={formData}
             setFormData={setFormData}
             buttonText={"Update Order Status"}
             onSubmit={handleUpdateStatus}
-            
+
           />
         </div>
       </div>

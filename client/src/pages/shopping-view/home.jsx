@@ -64,6 +64,7 @@ function ShoppingHome() {
   const { productList, productDetails, isLoading } = useSelector(
     (state) => state.shopProducts
   );
+  const { cartItems } = useSelector((state) => state.shopCart);
   const { featureImageList } = useSelector((state) => state.commonFeature);
 
   const slides = featureImageList && featureImageList.length > 0
@@ -257,6 +258,12 @@ function ShoppingHome() {
                   handleGetProductDetails={handleGetProductDetails}
                   product={productItem}
                   handleAddtoCart={handleAddtoCart}
+                  isInCart={
+                    cartItems?.items?.length > 0 &&
+                    cartItems.items.findIndex(
+                      (item) => item.productId === productItem._id
+                    ) > -1
+                  }
                 />
               ))
               : null}

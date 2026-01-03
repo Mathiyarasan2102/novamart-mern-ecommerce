@@ -8,6 +8,7 @@ function ShoppingProductTile({
   product,
   handleGetProductDetails,
   handleAddtoCart,
+  isInCart,
 }) {
   const [imageError, setImageError] = useState(false);
 
@@ -75,8 +76,9 @@ function ShoppingProductTile({
           <Button
             onClick={() => handleAddtoCart(product?._id, product?.totalStock)}
             className="w-full cursor-pointer border hover:bg-blend-color-burn"
+            disabled={isInCart}
           >
-            Add to cart
+            {isInCart ? "Item added to cart" : "Add to cart"}
           </Button>
         )}
       </CardFooter>
