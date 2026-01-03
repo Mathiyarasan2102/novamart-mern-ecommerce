@@ -8,17 +8,20 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
-import { sortOptions } from "@/config";
+import { sortOptions, filterOptions } from "@/config";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import {
   fetchAllFilteredProducts,
   fetchProductDetails,
 } from "@/store/shop/products-slice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowUpDownIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowUpDownIcon, Filter, X } from "lucide-react";
+import { useEffect, useState, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
@@ -47,6 +50,7 @@ function ShoppingListing() {
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [openFilterMenu, setOpenFilterMenu] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -148,15 +152,57 @@ function ShoppingListing() {
   }, [productDetails]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
-      <ProductFilter filters={filters} handleFilter={handleFilter} />
+    <div className="grid grid-cols-1 gap-6 p-4 md:p-6">
       <div className="bg-background w-full rounded-lg shadow-sm">
-        <div className="p-4 border-b flex items-center justify-between">
+        <div className="p-4 border-b flex flex-col md:flex-row items-center justify-between gap-3">
           <h2 className="text-lg font-extrabold">All Products</h2>
           <div className="flex items-center gap-3">
             <span className="text-muted-foreground">
               {productList?.length} Products
             </span>
+            <DropdownMenu open={openFilterMenu} onOpenChange={setOpenFilterMenu}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <Filter className="h-4 w-4" />
+                  <span>Filter</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px]">
+                <DropdownMenuLabel className="flex items-center justify-between">
+                  Filters
+                  <X
+                    className="h-4 w-4 cursor-pointer mr-2"
+                    onClick={() => setOpenFilterMenu(false)}
+                  />
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {Object.keys(filterOptions).map((keyItem) => (
+                  <Fragment key={keyItem}>
+                    <DropdownMenuLabel>{keyItem}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {filterOptions[keyItem].map((option) => (
+                      <DropdownMenuCheckboxItem
+                        key={option.id}
+                        checked={
+                          filters &&
+                          filters[keyItem] &&
+                          filters[keyItem].indexOf(option.id) > -1
+                        }
+                        onCheckedChange={() => handleFilter(keyItem, option.id)}
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        {option.label}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                  </Fragment>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -215,6 +261,7 @@ function ShoppingListing() {
           ) : productList && productList.length > 0 ? (
             productList.map((productItem) => (
               <ShoppingProductTitle
+                key={productItem.id}
                 handleGetProductDetails={handleGetProductDetails}
                 product={productItem}
                 handleAddtoCart={handleAddtoCart}

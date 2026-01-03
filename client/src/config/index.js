@@ -26,8 +26,8 @@ export const registerFormControls = [
     placeholder: "Enter your password",
     type: "password",
     componentType: "input",
-    autocomplete: "new-password", 
-    
+    autocomplete: "new-password",
+
   },
 ];
 
@@ -40,7 +40,7 @@ export const loginFormControls = [
     componentType: "input",
     autocomplete: "email",
 
-    
+
   },
   {
     name: "password",
@@ -149,11 +149,6 @@ export const shoppingViewHeaderMenuItems = [
     id: "accessories",
     label: "Accessories",
     path: "/shop/listing",
-  },
-  {
-    id: "search",
-    label: "Search",
-    path: "/shop/search",
   },
 ];
 

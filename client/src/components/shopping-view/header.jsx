@@ -1,11 +1,11 @@
-import { HouseIcon, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { HouseIcon, LogOut, Menu, ShoppingCart, UserCog, Search } from "lucide-react";
 import {
 	Link,
 	useLocation,
 	useNavigate,
 	useSearchParams,
 } from "react-router-dom";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { shoppingViewHeaderMenuItems } from "@/config";
@@ -25,7 +25,7 @@ import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
-function MenuItems() {
+function MenuItems({ closeMenu }) {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -48,6 +48,8 @@ function MenuItems() {
 				new URLSearchParams(`?category=${getCurrentMenuItem.id}`)
 			)
 			: navigate(getCurrentMenuItem.path);
+
+		if (closeMenu) closeMenu();
 	}
 
 	return (
@@ -55,7 +57,7 @@ function MenuItems() {
 			{shoppingViewHeaderMenuItems.map((menuItem) => (
 				<Label
 					onClick={() => handleNavigate(menuItem)}
-					className="text-sm font-medium cursor-pointer"
+					className="text-sm font-medium cursor-pointer hover:text-primary transition-colors duration-200"
 					key={menuItem.id}
 				>
 					{menuItem.label}
@@ -65,7 +67,7 @@ function MenuItems() {
 	);
 }
 
-function HeaderRightContent() {
+function HeaderRightContent({ hideCart }) {
 	const { user, isAuthenticated } = useSelector((state) => state.auth); // Added isAuthenticated
 	const { cartItems } = useSelector((state) => state.shopCart);
 	const [openCartSheet, setOpenCartSheet] = useState(false);
@@ -86,17 +88,20 @@ function HeaderRightContent() {
 	if (!isAuthenticated) {
 		return (
 			<div className="flex lg:items-center lg:flex-row flex-col gap-4">
+				{!hideCart && (
+					<Button
+						onClick={() => navigate('/auth/login', { state: { from: location } })}
+						variant="outline"
+						size="icon"
+						className="relative"
+					>
+						<ShoppingCart className="w-6 h-6" />
+						<span className="sr-only">User cart</span>
+					</Button>
+				)}
 				<Button
 					onClick={() => navigate('/auth/login', { state: { from: location } })}
-					variant="outline"
-					size="icon"
-					className="relative"
-				>
-					<ShoppingCart className="w-6 h-6" />
-					<span className="sr-only">User cart</span>
-				</Button>
-				<Button
-					onClick={() => navigate('/auth/login', { state: { from: location } })}
+					className="font-medium"
 				>
 					Login
 				</Button>
@@ -106,28 +111,30 @@ function HeaderRightContent() {
 
 	return (
 		<div className="flex lg:items-center lg:flex-row flex-col gap-4">
-			<Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
-				<Button
-					onClick={() => setOpenCartSheet(true)}
-					variant="outline"
-					size="icon"
-					className="relative"
-				>
-					<ShoppingCart className="w-6 h-6" />
-					<span className="absolute top-[-5px] right-[2px] font-bold text-sm">
-						{cartItems?.items?.length || 0}
-					</span>
-					<span className="sr-only">User cart</span>
-				</Button>
-				<UserCartWrapper
-					setOpenCartSheet={setOpenCartSheet}
-					cartItems={
-						cartItems && cartItems.items && cartItems.items.length > 0
-							? cartItems.items
-							: []
-					}
-				/>
-			</Sheet>
+			{!hideCart && (
+				<Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
+					<Button
+						onClick={() => setOpenCartSheet(true)}
+						variant="outline"
+						size="icon"
+						className="relative"
+					>
+						<ShoppingCart className="w-6 h-6" />
+						<span className="absolute top-[-5px] right-[2px] font-bold text-sm">
+							{cartItems?.items?.length || 0}
+						</span>
+						<span className="sr-only">User cart</span>
+					</Button>
+					<UserCartWrapper
+						setOpenCartSheet={setOpenCartSheet}
+						cartItems={
+							cartItems && cartItems.items && cartItems.items.length > 0
+								? cartItems.items
+								: []
+						}
+					/>
+				</Sheet>
+			)}
 
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -156,7 +163,11 @@ function HeaderRightContent() {
 }
 
 function ShoppingHeader() {
-	const { isAuthenticated } = useSelector((state) => state.auth);
+	const { isAuthenticated, user } = useSelector((state) => state.auth);
+	const { cartItems } = useSelector((state) => state.shopCart);
+	const [openCartSheet, setOpenCartSheet] = useState(false);
+	const [openMenu, setOpenMenu] = useState(false);
+	const navigate = useNavigate();
 
 	return (
 		<header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -165,18 +176,82 @@ function ShoppingHeader() {
 					<HouseIcon className="h-6 w-6" />
 					<span className="font-bold">NovaMart</span>
 				</Link>
-				<Sheet>
-					<SheetTrigger asChild>
-						<Button variant="outline" size="icon" className="lg:hidden">
-							<Menu className="h-6 w-6" />
-							<span className="sr-only">Toggle header menu</span>
+
+				{/* Mobile Right Section */}
+				<div className="flex items-center gap-2 lg:hidden">
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={() => navigate('/shop/search')}
+						className="text-foreground"
+					>
+						<Search className="w-6 h-6" />
+						<span className="sr-only">Search</span>
+					</Button>
+
+					<Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
+						<Button
+							onClick={() => {
+								if (!isAuthenticated) {
+									navigate('/auth/login');
+									return;
+								}
+								setOpenCartSheet(true);
+							}}
+							variant="outline"
+							size="icon"
+							className="relative"
+						>
+							<ShoppingCart className="w-6 h-6" />
+							{isAuthenticated && cartItems?.items?.length > 0 && (
+								<span className="absolute top-[-5px] right-[2px] font-bold text-sm bg-red-500 text-white rounded-full px-1 min-w-[1.25rem]">
+									{cartItems.items.length}
+								</span>
+							)}
+							<span className="sr-only">User cart</span>
 						</Button>
-					</SheetTrigger>
-					<SheetContent side="left" className="w-full max-w-xs">
-						<MenuItems />
-						<HeaderRightContent />
-					</SheetContent>
-				</Sheet>
+						{isAuthenticated && (
+							<UserCartWrapper
+								setOpenCartSheet={setOpenCartSheet}
+								cartItems={
+									cartItems && cartItems.items && cartItems.items.length > 0
+										? cartItems.items
+										: []
+								}
+							/>
+						)}
+					</Sheet>
+
+					<Sheet open={openMenu} onOpenChange={setOpenMenu}>
+						<SheetTrigger asChild>
+							<Button variant="outline" size="icon">
+								<Menu className="h-6 w-6" />
+								<span className="sr-only">Toggle header menu</span>
+							</Button>
+						</SheetTrigger>
+						<SheetContent side="left" className="w-full max-w-xs overflow-y-auto">
+							<SheetHeader className="mb-8">
+								<SheetTitle>
+									<div className="flex items-center gap-2">
+										<HouseIcon className="h-6 w-6" />
+										<span className="font-bold text-xl">NovaMart</span>
+									</div>
+								</SheetTitle>
+							</SheetHeader>
+							<div className="flex flex-col gap-6 px-4">
+								<MenuItems closeMenu={() => setOpenMenu(false)} />
+								{/* HeaderRightContent might duplicate cart/user logic if not carefully handled. 
+									Since we moved Cart/Search out, maybe we just want User Menu and Logout here?
+									For now, leaving it as requested, but user specifically asked for search/cart near menu.
+									We might want to hide Cart from this list if it's in the header, 
+									but HeaderRightContent has it. Let's leave it for now as a fallback.
+								 */}
+								<HeaderRightContent hideCart={true} />
+							</div>
+						</SheetContent>
+					</Sheet>
+				</div>
+
 				<div className="hidden lg:block">
 					<MenuItems />
 				</div>
