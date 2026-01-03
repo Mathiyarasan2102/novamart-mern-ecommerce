@@ -16,7 +16,7 @@ import ShoppingAccount from "./pages/shopping-view/account";
 import CheckAuth from "./components/common/check-auth";
 import UnauthPage from "./pages/unauth-page";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkAuth, setUser } from "./store/auth-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaypalReturnPage from "./pages/shopping-view/paypal-return";
@@ -30,6 +30,9 @@ function App() {
   );
   const dispatch = useDispatch();
 
+  const [isDelayed, setIsDelayed] = useState(false);
+  const [isTakingLong, setIsTakingLong] = useState(false);
+
   useEffect(() => {
     // Persist login using localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -39,13 +42,32 @@ function App() {
     dispatch(checkAuth()); // Always check backend session
   }, [dispatch]);
 
+  useEffect(() => {
+    let timer1, timer2;
+    if (isLoading) {
+      timer1 = setTimeout(() => setIsDelayed(true), 2000); // 2 seconds
+      timer2 = setTimeout(() => setIsTakingLong(true), 10000); // 10 seconds
+    } else {
+      setIsDelayed(false);
+      setIsTakingLong(false);
+    }
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [isLoading]);
+
   if (isLoading)
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-white">
         {/* Simple modern spinner */}
         <div className="w-16 h-16 border-4 border-gray-300 border-t-black rounded-full animate-spin"></div>
         <p className="mt-4 text-gray-800 text-lg font-semibold tracking-wide animate-pulse">
-          Loading your experience...
+          {isTakingLong
+            ? "Server is waking up, thank you for your patience..."
+            : isDelayed
+              ? "Establishing connection..."
+              : "Loading your experience..."}
         </p>
       </div>
     );
