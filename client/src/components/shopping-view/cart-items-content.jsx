@@ -74,35 +74,36 @@ function UserCartItemsContent({ cartItem }) {
       <img
         src={cartItem?.image}
         alt={cartItem?.title}
-        className="w-20 h-20 rounded-2xl object-cover"
+        loading="lazy"
+        className="w-16 h-16 rounded object-cover"
       />
       <div className="flex-1">
-        <h3 className="font-extrabold">{cartItem?.title}</h3>
+        <h3 className="font-bold text-sm line-clamp-2">{cartItem?.title}</h3>
         <div className="flex items-center gap-2 mt-1">
           <Button
             variant="outline"
-            className="h-8 w-8 cursor-pointer rounded-full"
+            className="h-7 w-7 cursor-pointer rounded-full"
             size="icon"
             disabled={cartItem?.quantity === 1}
             onClick={() => handleUpdateQuantity(cartItem, "minus")}
           >
-            <Minus className="w-4 cursor-pointer h-4" />
+            <Minus className="w-3 h-3" />
             <span className="sr-only">Decrease</span>
           </Button>
-          <span className="font-semibold">{cartItem?.quantity}</span>
+          <span className="font-medium text-sm">{cartItem?.quantity}</span>
           <Button
             variant="outline"
-            className="h-8 w-8 cursor-pointer rounded-full"
+            className="h-7 w-7 cursor-pointer rounded-full"
             size="icon"
             onClick={() => handleUpdateQuantity(cartItem, "plus")}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3 h-3" />
             <span className="sr-only">Decrease</span>
           </Button>
         </div>
       </div>
       <div className="flex flex-col items-end">
-        <p className="font-semibold">
+        <p className="font-semibold text-sm">
           ₹
           {(
             (cartItem?.salePrice > 0 ? cartItem?.salePrice : cartItem?.price) *
@@ -111,8 +112,8 @@ function UserCartItemsContent({ cartItem }) {
         </p>
         <Trash
           onClick={() => handleCartItemDelete(cartItem)}
-          className="cursor-pointer mt-1"
-          size={20}
+          className="cursor-pointer mt-1 text-red-500 hover:text-red-700 transition-colors"
+          size={18}
         />
       </div>
     </div>

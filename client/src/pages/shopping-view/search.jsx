@@ -119,6 +119,7 @@ function SearchProducts() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {searchResults.map((item) => (
           <ShoppingProductTitle
+            key={item._id}
             handleAddtoCart={handleAddtoCart}
             isInCart={
               cartItems?.items?.length > 0 &&

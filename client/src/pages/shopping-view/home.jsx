@@ -151,6 +151,7 @@ function ShoppingHome() {
           <img
             src={slide}
             key={index}
+            loading={index === 0 ? "eager" : "lazy"}
             className={`${index === currentSlide ? "opacity-100" : "opacity-0"
               } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
           />

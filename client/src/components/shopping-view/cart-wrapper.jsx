@@ -20,30 +20,36 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
       : 0;
 
   return (
-    <SheetContent className="sm:max-w-md backdrop:blur-2xl px-5 bg-white/80">
+    <SheetContent className="w-full max-w-full sm:max-w-md backdrop:blur-2xl px-5 bg-white/80 flex flex-col h-full">
       <SheetHeader>
-        <SheetTitle>Your Cart</SheetTitle>
+        <SheetTitle className="text-xl font-bold">Your Cart</SheetTitle>
       </SheetHeader>
-      <div className="mt-8 space-y-4">
-        {cartItems && cartItems.length > 0
-          ? cartItems.map((item) => <UserCartItemsContent cartItem={item} />)
-          : null}
+      <div className="mt-5 flex-1 overflow-y-auto pr-2 scrollbar-hide">
+        {cartItems && cartItems.length > 0 ? (
+          <div className="space-y-4">
+            {cartItems.map((item) => <UserCartItemsContent key={item.productId} cartItem={item} />)}
+          </div>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-center">
+            <span className="text-muted-foreground text-lg">Your cart is empty</span>
+          </div>
+        )}
       </div>
-      <div className="mt-8 space-y-4">
+      <div className="mt-6 pt-4 border-t space-y-4 bg-transparent">
         <div className="flex justify-between">
-          <span className="font-bold">Total</span>
-          <span className="font-bold">₹{totalCartAmount}</span>
+          <span className="font-bold text-lg">Total</span>
+          <span className="font-bold text-lg">₹{totalCartAmount.toFixed(2)}</span>
         </div>
+        <Button
+          onClick={() => {
+            navigate("/shop/checkout");
+            setOpenCartSheet(false);
+          }}
+          className="w-full py-6 text-base"
+        >
+          Checkout
+        </Button>
       </div>
-      <Button
-        onClick={() => {
-          navigate("/shop/checkout");
-          setOpenCartSheet(false);
-        }}
-        className="w-full border mt-6"
-      >
-        Checkout
-      </Button>
     </SheetContent>
   );
 }

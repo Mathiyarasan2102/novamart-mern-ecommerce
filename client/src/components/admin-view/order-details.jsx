@@ -41,7 +41,7 @@ function AdminOrderDetailsView({ orderDetails }) {
   }
 
   return (
-    <DialogContent className="sm:max-w-[600px] bg-white">
+    <DialogContent className="sm:max-w-[600px] bg-white h-[80vh] overflow-auto">
       <div className="grid gap-6">
         <div className="grid gap-2">
           <div className="flex mt-6 items-center justify-between">
@@ -69,18 +69,18 @@ function AdminOrderDetailsView({ orderDetails }) {
             <Label>
               <Badge
                 className={`py-1 px-3 text-white ${orderDetails?.orderStatus === "confirmed"
-                    ? "bg-green-500"
-                    : orderDetails?.orderStatus === "rejected"
-                      ? "bg-red-600"
-                      : orderDetails?.orderStatus === "pending"
-                        ? "bg-yellow-500"
-                        : orderDetails?.orderStatus === "inProcess"
-                          ? "bg-blue-500"
-                          : orderDetails?.orderStatus === "inShipping"
-                            ? "bg-purple-500"
-                            : orderDetails?.orderStatus === "delivered"
-                              ? "bg-green-500"
-                              : "bg-black"
+                  ? "bg-green-500"
+                  : orderDetails?.orderStatus === "rejected"
+                    ? "bg-red-600"
+                    : orderDetails?.orderStatus === "pending"
+                      ? "bg-yellow-500"
+                      : orderDetails?.orderStatus === "inProcess"
+                        ? "bg-blue-500"
+                        : orderDetails?.orderStatus === "inShipping"
+                          ? "bg-purple-500"
+                          : orderDetails?.orderStatus === "delivered"
+                            ? "bg-green-500"
+                            : "bg-black"
                   }`}
               >
                 {orderDetails?.orderStatus}

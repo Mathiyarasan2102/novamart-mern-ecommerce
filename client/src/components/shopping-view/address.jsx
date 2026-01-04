@@ -20,7 +20,7 @@ const initialAddressFormData = {
   notes: "",
 };
 
-function Address({ setCurrentSelectedAddress, selectedId }) {
+function Address({ setCurrentSelectedAddress, selectedId, displayMode = "both" }) {
   const [formData, setFormData] = useState(initialAddressFormData);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const dispatch = useDispatch();
@@ -43,35 +43,35 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
 
     currentEditedId !== null
       ? dispatch(
-          editaAddress({
-            userId: user?.id,
-            addressId: currentEditedId,
-            formData,
-          })
-        ).then((data) => {
-          if (data?.payload?.success) {
-            dispatch(fetchAllAddresses(user?.id));
-            setCurrentEditedId(null);
-            setFormData(initialAddressFormData);
-            toast({
-              title: "Address updated successfully",
-            });
-          }
+        editaAddress({
+          userId: user?.id,
+          addressId: currentEditedId,
+          formData,
         })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllAddresses(user?.id));
+          setCurrentEditedId(null);
+          setFormData(initialAddressFormData);
+          toast({
+            title: "Address updated successfully",
+          });
+        }
+      })
       : dispatch(
-          addNewAddress({
-            ...formData,
-            userId: user?.id,
-          })
-        ).then((data) => {
-          if (data?.payload?.success) {
-            dispatch(fetchAllAddresses(user?.id));
-            setFormData(initialAddressFormData);
-            toast({
-              title: "Address added successfully",
-            });
-          }
-        });
+        addNewAddress({
+          ...formData,
+          userId: user?.id,
+        })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllAddresses(user?.id));
+          setFormData(initialAddressFormData);
+          toast({
+            title: "Address added successfully",
+          });
+        }
+      });
   }
 
   function handleDeleteAddress(getCurrentAddress) {
@@ -91,11 +91,11 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
     setCurrentEditedId(getCuurentAddress?._id);
     setFormData({
       ...formData,
-      address: getCuurentAddress?.address,
-      city: getCuurentAddress?.city,
-      phone: getCuurentAddress?.phone,
-      pincode: getCuurentAddress?.pincode,
-      notes: getCuurentAddress?.notes,
+      address: getCuurentAddress?.address || "",
+      city: getCuurentAddress?.city || "",
+      phone: getCuurentAddress?.phone || "",
+      pincode: getCuurentAddress?.pincode || "",
+      notes: getCuurentAddress?.notes || "",
     });
   }
 
@@ -109,12 +109,18 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
     dispatch(fetchAllAddresses(user?.id));
   }, [dispatch]);
 
+  const showList = displayMode === "both" || displayMode === "list";
+  const showForm =
+    displayMode === "both" || displayMode === "add" || currentEditedId !== null;
+
   return (
     <Card>
-      <div className="mb-5 p-3 grid grid-cols-1 sm:grid-cols-2  gap-2">
-        {addressList && addressList.length > 0
-          ? addressList.map((singleAddressItem) => (
+      {showList && (
+        <div className="mb-5 p-3 grid grid-cols-1 sm:grid-cols-2  gap-2">
+          {addressList && addressList.length > 0 ? (
+            addressList.map((singleAddressItem) => (
               <AddressCard
+                key={singleAddressItem?._id}
                 selectedId={selectedId}
                 handleDeleteAddress={handleDeleteAddress}
                 addressInfo={singleAddressItem}
@@ -122,23 +128,32 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
                 setCurrentSelectedAddress={setCurrentSelectedAddress}
               />
             ))
-          : null}
-      </div>
-      <CardHeader>
-        <CardTitle>
-          {currentEditedId !== null ? "Edit Address" : "Add New Address"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <CommonForm
-          formControls={addressFormControls}
-          formData={formData}
-          setFormData={setFormData}
-          buttonText={currentEditedId !== null ? "Edit" : "Add"}
-          onSubmit={handleManageAddress}
-          isBtnDisabled={!isFormValid()}
-        />
-      </CardContent>
+          ) : (
+            <div className="col-span-full text-center text-muted-foreground p-4">
+              Review your addresses here.
+            </div>
+          )}
+        </div>
+      )}
+      {showForm && (
+        <>
+          <CardHeader>
+            <CardTitle>
+              {currentEditedId !== null ? "Edit Address" : "Add New Address"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <CommonForm
+              formControls={addressFormControls}
+              formData={formData}
+              setFormData={setFormData}
+              buttonText={currentEditedId !== null ? "Edit" : "Add"}
+              onSubmit={handleManageAddress}
+              isBtnDisabled={!isFormValid()}
+            />
+          </CardContent>
+        </>
+      )}
     </Card>
   );
 }

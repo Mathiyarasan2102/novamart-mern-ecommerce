@@ -131,6 +131,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 alt={productDetails?.title}
                 width={600}
                 height={600}
+                loading="lazy"
                 className="aspect-square w-full rounded-4xl object-cover"
                 onError={() => setImageError(true)}
               />

@@ -103,15 +103,13 @@ function AdminOrdersView() {
                         dispatch(resetOrderDetails());
                       }}
                     >
-                      <Button className="border cursor-pointer"
-                        onClick={() =>
-                          handleFetchOrderDetails(orderItem?._id)
-                        }
-                      >
-                        View Details
-                      </Button>
                       <AdminOrderDetailsView orderDetails={orderDetails} />
                     </Dialog>
+                    <Button
+                      onClick={() => handleFetchOrderDetails(orderItem?._id)}
+                    >
+                      View Details
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))

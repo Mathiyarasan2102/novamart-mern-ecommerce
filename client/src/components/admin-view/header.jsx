@@ -19,7 +19,7 @@ export default function AdminHeader({ setOpen }) {
       <div className="flex flex-1 justify-end">
         <Button
           onClick={handleLogout}
-           className="inline-flex gap-2 items-center px-4 py-2 text-sm font-medium rounded-md bg-black text-white border-2 border-transparent shadow
+          className="inline-flex gap-2 items-center px-4 py-2 text-sm font-medium rounded-md bg-black text-white border-2 border-transparent shadow
              hover:bg-white hover:text-black hover:border-black hover:rounded-full
              transition-all duration-200 ease-in"
         >

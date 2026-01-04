@@ -3,7 +3,7 @@ import img from "../../assets/account.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import UserCartItemsContent from "@/components/shopping-view/cart-items-content";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createNewOrder } from "@/store/shop/order-slice";
 import { Navigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,14 +20,14 @@ function ShoppingCheckout() {
   const totalCartAmount =
     cartItems && cartItems.items && cartItems.items.length > 0
       ? cartItems.items.reduce(
-          (sum, currentItem) =>
-            sum +
-            (currentItem?.salePrice > 0
-              ? currentItem?.salePrice
-              : currentItem?.price) *
-              currentItem?.quantity,
-          0
-        )
+        (sum, currentItem) =>
+          sum +
+          (currentItem?.salePrice > 0
+            ? currentItem?.salePrice
+            : currentItem?.price) *
+          currentItem?.quantity,
+        0
+      )
       : 0;
 
   function handleInitiatePaypalPayment() {
@@ -88,6 +88,16 @@ function ShoppingCheckout() {
     });
   }
 
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeAddressTab, setActiveAddressTab] = useState("list");
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (approvalURL) {
     window.location.href = approvalURL;
   }
@@ -97,18 +107,41 @@ function ShoppingCheckout() {
       <div className="relative h-[300px] w-full overflow-hidden">
         <img src={img} className="h-full w-full object-cover object-center" />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5 p-5">
-        <Address
-          selectedId={currentSelectedAddress}
-          setCurrentSelectedAddress={setCurrentSelectedAddress}
-        />
-        <div className="flex flex-col gap-4">
+
+      <div className="flex flex-col sm:grid sm:grid-cols-2 gap-5 mt-5 p-5">
+        <div className="sm:col-start-2 flex flex-col gap-4">
           {cartItems && cartItems.items && cartItems.items.length > 0
             ? cartItems.items.map((item) => (
-                <UserCartItemsContent cartItem={item} />
-              ))
+              <UserCartItemsContent key={item.productId} cartItem={item} />
+            ))
             : null}
-          <div className="mt-8 space-y-4">
+          {/* Mobile-only Address Tabs */}
+          {isMobile && (
+            <div className="grid grid-cols-2 gap-2 mt-2 sm:hidden">
+              <Button
+                variant={activeAddressTab === "list" ? "default" : "outline"}
+                onClick={() => setActiveAddressTab("list")}
+              >
+                Select Address
+              </Button>
+              <Button
+                variant={activeAddressTab === "add" ? "default" : "outline"}
+                onClick={() => setActiveAddressTab("add")}
+              >
+                Add New Address
+              </Button>
+            </div>
+          )}
+        </div>
+        <div className="sm:col-start-1 sm:row-start-1 sm:row-span-2">
+          <Address
+            selectedId={currentSelectedAddress}
+            setCurrentSelectedAddress={setCurrentSelectedAddress}
+            displayMode={isMobile ? activeAddressTab : "both"}
+          />
+        </div>
+        <div className="sm:col-start-2 flex flex-col gap-4">
+          <div className="mt-4 space-y-4">
             <div className="flex justify-between">
               <span className="font-bold">Total</span>
               <span className="font-bold">${totalCartAmount}</span>
@@ -123,7 +156,7 @@ function ShoppingCheckout() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 

@@ -14,6 +14,7 @@ function AdminProductTitle({
         <img
           src={product?.image}
           alt={product?.title}
+          loading="lazy"
           className="w-full h-[300px] object-cover rounded-t-lg"
         />
       </div>

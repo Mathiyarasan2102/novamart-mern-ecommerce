@@ -1,10 +1,22 @@
 import { Outlet } from "react-router-dom";
 import AdminSideBar from "./sidebar";
 import AdminHeader from "./header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function AdminLayout() {
   const [openSidebar, setOpenSidebar] = useState(false);
+
+  // Close mobile sidebar if resized to desktop view
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024 && openSidebar) {
+        setOpenSidebar(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [openSidebar]);
 
   return (
     <div className="flex min-h-screen w-full">

@@ -169,6 +169,18 @@ function ShoppingHeader() {
 	const [openMenu, setOpenMenu] = useState(false);
 	const navigate = useNavigate();
 
+	// Close mobile menu if resized to desktop view
+	useEffect(() => {
+		const handleResize = () => {
+			if (window.innerWidth >= 1024 && openMenu) {
+				setOpenMenu(false);
+			}
+		};
+
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, [openMenu]);
+
 	return (
 		<header className="sticky top-0 z-40 w-full border-b bg-background">
 			<div className="flex h-16 items-center justify-between px-4 md:px-6">
@@ -222,6 +234,8 @@ function ShoppingHeader() {
 						)}
 					</Sheet>
 
+					<HeaderRightContent hideCart={true} />
+
 					<Sheet open={openMenu} onOpenChange={setOpenMenu}>
 						<SheetTrigger asChild>
 							<Button variant="outline" size="icon">
@@ -240,13 +254,6 @@ function ShoppingHeader() {
 							</SheetHeader>
 							<div className="flex flex-col gap-6 px-4">
 								<MenuItems closeMenu={() => setOpenMenu(false)} />
-								{/* HeaderRightContent might duplicate cart/user logic if not carefully handled. 
-									Since we moved Cart/Search out, maybe we just want User Menu and Logout here?
-									For now, leaving it as requested, but user specifically asked for search/cart near menu.
-									We might want to hide Cart from this list if it's in the header, 
-									but HeaderRightContent has it. Let's leave it for now as a fallback.
-								 */}
-								<HeaderRightContent hideCart={true} />
 							</div>
 						</SheetContent>
 					</Sheet>

@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { brandOptionsMap, categoryOptionsMap } from "@/config";
 import { Badge } from "../ui/badge";
-import { useState } from "react";
+import { useState, memo } from "react";
 
 function ShoppingProductTile({
   product,
@@ -20,6 +20,7 @@ function ShoppingProductTile({
             <img
               src={product?.image}
               alt={product?.title}
+              loading="lazy"
               className="w-full h-[300px] object-cover rounded-t-lg"
               onError={() => setImageError(true)}
             />
@@ -86,4 +87,4 @@ function ShoppingProductTile({
   );
 }
 
-export default ShoppingProductTile;
+export default memo(ShoppingProductTile);

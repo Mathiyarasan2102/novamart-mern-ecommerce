@@ -21,7 +21,7 @@ import {
 } from "@/store/shop/products-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowUpDownIcon, Filter, X } from "lucide-react";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
@@ -83,55 +83,75 @@ function ShoppingListing() {
     sessionStorage.setItem("filters", JSON.stringify(cpyFilters));
   }
 
-  function handleGetProductDetails(getCurrentProductId) {
-    dispatch(fetchProductDetails(getCurrentProductId));
-  }
+  const handleGetProductDetails = useCallback(
+    (getCurrentProductId) => {
+      dispatch(fetchProductDetails(getCurrentProductId));
+    },
+    [dispatch]
+  );
 
-  function handleAddtoCart(getCurrentProductId, getTotalStock) {
-    if (!user) {
-      navigate("/auth/login", { state: { from: location } });
-      return;
-    }
+  const handleAddtoCart = useCallback(
+    (getCurrentProductId, getTotalStock) => {
+      if (!user) {
+        navigate("/auth/login", { state: { from: location } });
+        return;
+      }
 
-    let getCartItems = cartItems.items || [];
+      let getCartItems = cartItems.items || [];
 
-    if (getCartItems.length) {
-      const indexOfCurrentItem = getCartItems.findIndex(
-        (item) => item.productId === getCurrentProductId
-      );
-      if (indexOfCurrentItem > -1) {
-        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
-        if (getQuantity + 1 > getTotalStock) {
-          toast({
-            title: `Only ${getQuantity} quantity can be added for this item`,
-            variant: "destructive",
-          });
+      if (getCartItems.length) {
+        const indexOfCurrentItem = getCartItems.findIndex(
+          (item) => item.productId === getCurrentProductId
+        );
+        if (indexOfCurrentItem > -1) {
+          const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+          if (getQuantity + 1 > getTotalStock) {
+            toast({
+              title: `Only ${getQuantity} quantity can be added for this item`,
+              variant: "destructive",
+            });
 
-          return;
+            return;
+          }
         }
       }
-    }
 
-    dispatch(
-      addToCart({
-        userId: user?.id,
-        productId: getCurrentProductId,
-        quantity: 1,
-      })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchCartItems(user?.id));
-        toast({
-          title: "Product is added to cart",
-        });
-      }
-    });
-  }
+      dispatch(
+        addToCart({
+          userId: user?.id,
+          productId: getCurrentProductId,
+          quantity: 1,
+        })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchCartItems(user?.id));
+          toast({
+            title: "Product is added to cart",
+          });
+        }
+      });
+    },
+    [user, cartItems, dispatch, navigate, location, toast]
+  );
 
   useEffect(() => {
     setSort("price-lowtohigh");
     setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
   }, [categorySearchParam]);
+
+  const [dropdownAlign, setDropdownAlign] = useState("end");
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDropdownAlign(window.innerWidth < 768 ? "center" : "end");
+    };
+
+    // Set initial value
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
@@ -171,7 +191,7 @@ function ShoppingListing() {
                   <span>Filter</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuContent align={dropdownAlign} className="w-[200px]">
                 <DropdownMenuLabel className="flex items-center justify-between">
                   Filters
                   <X
@@ -214,7 +234,7 @@ function ShoppingListing() {
                   <span>Sort by</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px] bg-white shadow-lg">
+              <DropdownMenuContent align={dropdownAlign} className="w-[200px] bg-white shadow-lg">
                 <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                   {sortOptions.map((sortItem) => (
                     <DropdownMenuRadioItem
@@ -261,7 +281,7 @@ function ShoppingListing() {
           ) : productList && productList.length > 0 ? (
             productList.map((productItem) => (
               <ShoppingProductTitle
-                key={productItem.id}
+                key={productItem._id}
                 handleGetProductDetails={handleGetProductDetails}
                 product={productItem}
                 handleAddtoCart={handleAddtoCart}

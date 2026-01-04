@@ -47,15 +47,16 @@ function AdminDashboard() {
         setUploadedImageUrl={setUploadedImageUrl}
         setImageLoadingState={setImageLoadingState}
         imageLoadingState={imageLoadingState}
-        isCustomStyling={true}
-      // isEditMode={currentEditedId !== null}
+
+        // isEditMode={currentEditedId !== null}
+        isCustomStyling={false}
       />
       <Button onClick={handleUploadFeatureImage} disabled={!uploadedImageUrl} className="mt-5 inline-flex gap-2 items-center px-4 py-2 text-sm font-medium rounded-full cursor-pointer bg-black text-white border-2 border-transparent shadow
                hover:bg-white hover:text-black hover:border-black hover:rounded-full
-               transition-all duration-300 ease-in-out w-md disabled:opacity-50 disabled:cursor-not-allowed">
+               transition-all duration-300 ease-in-out w-full max-w-md disabled:opacity-50 disabled:cursor-not-allowed">
         Upload
       </Button>
-      <div className="flex flex-col gap-4 mt-5">
+      <div className="flex flex-col gap-4 mt-5 w-full max-w-md">
         {isLoading ? (
           // Render 3 skeleton items for feature images
           Array.from({ length: 3 }).map((_, index) => (
@@ -68,7 +69,7 @@ function AdminDashboard() {
             <div className="relative">
               <img
                 src={featureImgItem.image}
-                className="w-full h-[300px] object-cover rounded-t-lg"
+                className="w-full h-auto object-cover rounded-t-lg"
               />
               <Button
                 onClick={() => handleDeleteFeatureImage(featureImgItem._id)}
