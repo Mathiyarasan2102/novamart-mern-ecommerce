@@ -88,6 +88,15 @@ function HeaderRightContent({ hideCart }) {
 	if (!isAuthenticated) {
 		return (
 			<div className="flex lg:items-center lg:flex-row flex-col gap-4">
+				<Button
+					variant="outline"
+					size="icon"
+					className="hidden lg:flex"
+					onClick={() => navigate("/shop/search")}
+				>
+					<Search className="w-6 h-6" />
+					<span className="sr-only">Search</span>
+				</Button>
 				{!hideCart && (
 					<Button
 						onClick={() => navigate('/auth/login', { state: { from: location } })}
@@ -111,6 +120,15 @@ function HeaderRightContent({ hideCart }) {
 
 	return (
 		<div className="flex lg:items-center lg:flex-row flex-col gap-4">
+			<Button
+				variant="outline"
+				size="icon"
+				className="hidden lg:flex"
+				onClick={() => navigate("/shop/search")}
+			>
+				<Search className="w-6 h-6" />
+				<span className="sr-only">Search</span>
+			</Button>
 			{!hideCart && (
 				<Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
 					<Button
