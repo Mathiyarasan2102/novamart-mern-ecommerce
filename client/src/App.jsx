@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import axios from "axios";
 import AuthLayout from "./components/auth/layout";
 import AuthLogin from "./pages/auth/login";
 import AuthRegister from "./pages/auth/register";
@@ -41,6 +42,23 @@ function App() {
     }
     dispatch(checkAuth()); // Always check backend session
   }, [dispatch]);
+
+  useEffect(() => {
+    const notifyVisit = async () => {
+      const hasVisited = sessionStorage.getItem("hasVisited");
+      if (!hasVisited) {
+        try {
+          await axios.post(`${import.meta.env.VITE_API_URL}/api/common/notify/visit`, {
+            userAgent: navigator.userAgent,
+          });
+          sessionStorage.setItem("hasVisited", "true");
+        } catch (error) {
+          console.error("Failed to send visit notification:", error);
+        }
+      }
+    };
+    notifyVisit();
+  }, []);
 
   useEffect(() => {
     let timer1, timer2;
